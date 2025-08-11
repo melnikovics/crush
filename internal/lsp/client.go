@@ -432,7 +432,7 @@ func (c *Client) ping(ctx context.Context) error {
 		return nil
 	}
 	// This is a very lightweight request that should work for most servers
-	return c.Notify(ctx, "$/cancelRequest", protocol.CancelParams{ID: "a"})
+	return c.Notify(ctx, "$/cancelRequest", protocol.CancelParams{ID: "1"})
 }
 
 // openTypeScriptFiles finds and opens TypeScript files to help initialize the server
