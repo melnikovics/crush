@@ -323,16 +323,7 @@ func (c *Client) WaitForServerReady(ctx context.Context) error {
 		slog.Debug("Waiting for LSP server to be ready...")
 	}
 
-	// Determine server type for specialized initialization
-	serverType := c.detectServerType()
-
-	// For TypeScript-like servers, we need to open some key files first
-	if serverType == ServerTypeTypeScript {
-		if cfg.Options.DebugLSP {
-			slog.Debug("TypeScript-like server detected, opening key configuration files")
-		}
-		c.openKeyConfigFiles(ctx)
-	}
+	c.openKeyConfigFiles(ctx)
 
 	for {
 		select {
@@ -343,7 +334,7 @@ func (c *Client) WaitForServerReady(ctx context.Context) error {
 			// Try a ping method appropriate for this server type
 			if err := c.ping(ctx); err != nil {
 				if cfg.Options.DebugLSP {
-					slog.Debug("LSP server not ready yet", "error", err, "serverType", serverType)
+					slog.Debug("LSP server not ready yet", "error", err, "server", c.name)
 				}
 				continue
 			}
@@ -441,7 +432,7 @@ func (c *Client) ping(ctx context.Context) error {
 		return nil
 	}
 	// This is a very lightweight request that should work for most servers
-	return c.Notify(ctx, "$/cancelRequest", struct{ ID int }{ID: -1})
+	return c.Notify(ctx, "$/cancelRequest", protocol.CancelParams{ID: "a"})
 }
 
 // openTypeScriptFiles finds and opens TypeScript files to help initialize the server
