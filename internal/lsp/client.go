@@ -57,6 +57,11 @@ type Client struct {
 
 	// Server state
 	serverState atomic.Value
+
+	// Server capabilities as returned by initialize
+	caps    protocol.ServerCapabilities
+	capsMu  sync.RWMutex
+	capsSet atomic.Bool
 }
 
 func NewClient(ctx context.Context, name, command string, args ...string) (*Client, error) {
@@ -216,6 +221,8 @@ func (c *Client) InitializeLSPClient(ctx context.Context, workspaceDir string) (
 	if err != nil {
 		return nil, fmt.Errorf("initialize failed: %w", err)
 	}
+
+	c.setCapabilities(result.Capabilities)
 
 	if err := c.Initialized(ctx, protocol.InitializedParams{}); err != nil {
 		return nil, fmt.Errorf("initialized notification failed: %w", err)
