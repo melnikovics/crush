@@ -378,7 +378,9 @@ func (a *appModel) handleWindowResize(width, height int) tea.Cmd {
 	a.width, a.height = width, height
 	// Update status bar
 	s, cmd := a.status.Update(tea.WindowSizeMsg{Width: width, Height: height})
-	a.status = s.(status.StatusCmp)
+	if model, ok := s.(status.StatusCmp); ok {
+		a.status = model
+	}
 	cmds = append(cmds, cmd)
 
 	// Update the current view.
